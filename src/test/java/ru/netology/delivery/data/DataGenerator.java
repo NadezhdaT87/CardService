@@ -30,9 +30,18 @@ public class DataGenerator {
         var faker = new Faker (new Locale(locale));
         return faker.name().lastName() +" "+ faker.name().firstName();
     }
+
+
     public static String generatePhone (String locale) {
-        var faker = new Faker (new Locale(locale));
+        var faker = new Faker(new Locale(locale));
         return faker.phoneNumber().phoneNumber();
+    }
+    public static String generateWrongPhone (String locale) {
+        var faker = new Faker(new Locale(locale));
+        return faker.phoneNumber().cellPhone();
+    }
+
+
 
 //    }
 //    public static class Registration {
@@ -49,5 +58,5 @@ public class DataGenerator {
 //        String city;
 //        String name;
 //        String phone;
-    }
+
 }

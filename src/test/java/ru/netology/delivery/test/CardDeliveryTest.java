@@ -1,8 +1,8 @@
 package ru.netology.delivery.test;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import com.codeborne.selenide.logevents.SelenideLogger;
+import io.qameta.allure.selenide.AllureSelenide;
+import org.junit.jupiter.api.*;
 import org.openqa.selenium.Keys;
 import ru.netology.delivery.data.DataGenerator;
 
@@ -15,6 +15,14 @@ import static com.codeborne.selenide.Selenide.open;
 
 
 public class CardDeliveryTest {
+    @BeforeAll
+    static void setUpAll(){
+        SelenideLogger.addListener("allure", new AllureSelenide());
+    }
+    @AfterAll
+    static void tearDownAll(){
+        SelenideLogger.removeListener("allure");
+    }
 
     @BeforeEach
     void setup() {
@@ -54,5 +62,21 @@ public class CardDeliveryTest {
         $("[data-test-id='success-notification']").shouldHave(text("Встреча успешно запланирована на "
                 + DataGenerator.generateData(daysToAddForSecondMeeting, "dd.MM.yyyy")));
 
+    }
+    @Test
+    @DisplayName("test get error if wrong phone")
+    void testGetErrorIfWrongPhone() {
+        var daysToAddForFirstMeeting = 4;
+
+        $("[data-test-id='city'] .input__control").setValue(DataGenerator.generateCity("ru"));
+        $("[data-test-id='date'] .input__control").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.DELETE);
+        $("[data-test-id='date'] .input__control").setValue(DataGenerator
+                .generateData(daysToAddForFirstMeeting, "dd.MM.yyyy"));
+        $("[data-test-id='name'] [name='name']").setValue(DataGenerator.generateName("ru"));
+        $("[data-test-id='phone'] [name='phone']").setValue(DataGenerator.generateWrongPhone("en"));
+        $("[data-test-id='agreement']").click();
+        $(byText("Запланировать")).click();
+        $("[data-test-id='phone'].input_invalid .input__sub")
+                .shouldHave(exactText("Неверный формат номера мобильного телефона"));
     }
 }
